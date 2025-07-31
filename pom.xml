@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>live.alinmiron.beamerparts</groupId>
+    <artifactId>beamerparts-platform</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>BeamerParts Platform</name>
+    <description>BMW Aftermarket Parts E-commerce Platform</description>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Custom Dependencies (not managed by Spring Boot BOM) -->
+        <jjwt.version>0.11.5</jjwt.version>
+        <stripe.version>24.2.0</stripe.version>
+        <itext.version>5.5.13.4</itext.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <hibernate-types.version>2.21.1</hibernate-types.version>
+        <thumbnailator.version>0.4.20</thumbnailator.version>
+        <commons-fileupload.version>1.5</commons-fileupload.version>
+        <hibernate-search.version>7.0.0.Final</hibernate-search.version>
+    </properties>
+
+    <modules>
+        <module>shared</module>
+        <module>api_gateway</module>
+        <module>user_service</module>
+        <module>vehicle_service</module>
+        <module>product_service</module>
+        <module>order_service</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <type>pom</type>
+                <version>3.5.4</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <type>pom</type>
+                <version>${spring-cloud.version}</version>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <exclude>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
