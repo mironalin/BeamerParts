@@ -1,0 +1,149 @@
+services:
+  # Infrastructure Services
+  postgres-user:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: beamerparts_user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_user_data:/var/lib/postgresql/data
+
+  postgres-vehicle:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: vehicle_db
+      POSTGRES_USER: beamerparts_vehicle
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_vehicle_data:/var/lib/postgresql/data
+
+  postgres-product:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: beamerparts_product
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_product_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: beamerparts
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  # Microservices
+  user-service:
+    build: ./user_service
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: postgres-user
+      DB_PORT: 5432
+      DB_USERNAME: beamerparts_user
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+      RABBITMQ_HOST: rabbitmq
+      PRODUCT_SERVICE_URL: http://product-service:8083
+      VEHICLE_SERVICE_URL: http://vehicle-service:8082
+    depends_on:
+      - postgres-user
+      - redis
+      - rabbitmq
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/user-service/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  vehicle-service:
+    build: ./vehicle_service
+    ports:
+      - "8082:8082"
+    environment:
+      DB_HOST: postgres-vehicle
+      DB_PORT: 5432
+      DB_USERNAME: beamerparts_vehicle
+      DB_PASSWORD: password
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - postgres-vehicle
+      - rabbitmq
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8082/vehicle-service/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  product-service:
+    build: ./product_service
+    ports:
+      - "8083:8083"
+    environment:
+      DB_HOST: postgres-product
+      DB_PORT: 5432
+      DB_USERNAME: beamerparts_product
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+      RABBITMQ_HOST: rabbitmq
+      VEHICLE_SERVICE_URL: http://vehicle-service:8082
+    depends_on:
+      - postgres-product
+      - redis
+      - rabbitmq
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/product-service/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api-gateway:
+    build: ./api_gateway
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_HOST: redis
+      USER_SERVICE_URL: http://user-service:8081
+      VEHICLE_SERVICE_URL: http://vehicle-service:8082
+      PRODUCT_SERVICE_URL: http://product-service:8083
+    depends_on:
+      - user-service
+      - vehicle-service
+      - product-service
+      - redis
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_user_data:
+  postgres_vehicle_data:
+  postgres_product_data:
+  redis_data:
+  rabbitmq_data:
+
+
+networks:
+  default:
+    driver: bridge
