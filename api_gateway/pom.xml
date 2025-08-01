@@ -8,7 +8,7 @@
 		<artifactId>beamerparts-platform</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	<groupId>live.alinmiron.beamerparts</groupId>
+		<groupId>live.alinmiron.beamerparts</groupId>
 	<artifactId>api_gateway</artifactId>
 	<name>api_gateway</name>
 	<description>API Gateway for BeamerParts</description>
