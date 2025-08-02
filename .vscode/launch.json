@@ -8,6 +8,47 @@
             "mainClass": "live.alinmiron.beamerparts.api_gateway.ApiGatewayApplication",
             "projectName": "api_gateway",
             "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-OrderServiceApplication<order_service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "live.alinmiron.order_service.OrderServiceApplication",
+            "projectName": "order_service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ProductServiceApplication<product_service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "live.alinmiron.product_service.ProductServiceApplication",
+            "projectName": "product_service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-UserServiceApplication<user_service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "live.alinmiron.user_service.UserServiceApplication",
+            "projectName": "user_service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-VehicleServiceApplication<vehicle_service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "live.alinmiron.vehicle_service.VehicleServiceApplication",
+            "projectName": "vehicle_service",
+            "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
     ]
