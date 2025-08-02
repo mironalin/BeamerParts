@@ -29,6 +29,8 @@ scripts/
 │   └── start-order-service.sh
 └── dev/                   # Development utilities
     ├── start-all-services.sh
+    ├── rebuild-restart-services.sh  # Rebuild & restart all services (keeps infrastructure)
+    ├── quick-restart-service.sh     # Quick restart single service
     ├── check-status.sh
     ├── stop-all.sh
     ├── clean-build.sh
@@ -97,6 +99,19 @@ scripts/
 ./scripts/dev/run-tests.sh
 ```
 
+### Development Workflow Scripts
+```bash
+# Rebuild and restart all services (keeps infrastructure running)
+./scripts/dev/rebuild-restart-services.sh
+
+# Quick restart a single service
+./scripts/dev/quick-restart-service.sh
+
+# Interactive single service restart
+./scripts/dev/quick-restart-service.sh user    # Restart user service
+./scripts/dev/quick-restart-service.sh gateway # Restart API gateway
+```
+
 ## 🌐 Service URLs
 
 Once all services are running, you can access:
@@ -151,9 +166,23 @@ When services are started via scripts, logs are saved to:
 
 1. **Always start infrastructure first** before starting services
 2. **Use the interactive menu** (`./scripts/dev-start.sh`) for the best experience
-3. **Check service status** regularly with `./scripts/dev/check-status.sh`
-4. **View logs** when debugging issues
-5. **Clean build** when switching branches or after dependency changes
+3. **For quick development iterations**:
+   - Use **Option 9** (Rebuild & Restart All Services) when you make changes to multiple services
+   - Use **Option 10** (Quick Restart Single Service) when you modify just one service
+4. **Check service status** regularly with `./scripts/dev/check-status.sh`
+5. **View logs** when debugging issues
+6. **Clean build** when switching branches or after dependency changes
+
+### Development Workflow
+- **Code change in one service** → Use Quick Restart (Option 10)
+- **Changes in shared library or multiple services** → Use Rebuild & Restart All (Option 9)
+- **Major changes or dependency updates** → Use Clean & Build All (Option 12)
+
+### Script Features
+- **Infrastructure stays running**: Rebuild scripts only restart Spring services, not databases/Redis/RabbitMQ
+- **Graceful shutdown**: Services are stopped properly by PID before force-killing
+- **Health checks**: Scripts wait for services to be healthy before proceeding
+- **Dependency order**: Services are started in proper order (User → Vehicle → Product → Order → Gateway)
 
 ## 🚨 Troubleshooting
 
@@ -163,12 +192,19 @@ The scripts will detect if ports are in use and offer to kill existing processes
 ### Services Not Starting
 1. Check if infrastructure is running: `./scripts/docker/status-infra.sh`
 2. Check service logs: `./scripts/dev/show-service-logs.sh`
-3. Try rebuilding: `./scripts/dev/clean-build.sh`
+3. Try rebuilding: `./scripts/dev/rebuild-restart-services.sh`
+4. For complete rebuild: `./scripts/dev/clean-build.sh`
 
 ### Database Connection Issues
 1. Ensure PostgreSQL containers are running
 2. Check Docker logs: `./scripts/dev/show-infra-logs.sh`
 3. Restart infrastructure: `./scripts/docker/stop-infra.sh && ./scripts/docker/start-infra.sh`
+
+### Development Issues
+- **Service won't restart**: Use `./scripts/dev/quick-restart-service.sh` for targeted restart
+- **Shared library changes**: Use `./scripts/dev/rebuild-restart-services.sh` to rebuild all services
+- **Stuck processes**: Scripts will force-kill processes on required ports if needed
+- **Health check failures**: Check service logs for startup errors
 
 ## 🔄 Making Scripts Executable
 
