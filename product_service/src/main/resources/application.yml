@@ -1,7 +1,5 @@
 server:
   port: 8083
-  servlet:
-    context-path: /product-service
 
 spring:
   application:
@@ -9,8 +7,8 @@ spring:
   
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5435}/product_db
-    username: ${DB_USERNAME:product_service}
-    password: ${DB_PASSWORD:product_password_123}
+    username: ${DB_USERNAME:beamerparts_product}
+    password: ${DB_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
   
   jpa:
@@ -53,6 +51,9 @@ management:
     web:
       exposure:
         include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
 
 logging:
   level:
