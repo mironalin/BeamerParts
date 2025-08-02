@@ -1,0 +1,65 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  
+  # Basic Gateway Configuration - Routes defined in Java (GatewayConfig.java)
+  cloud:
+    gateway:
+      # Global CORS Configuration
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedorigins: 
+              - "http://localhost:3000"
+              - "http://localhost:4200"
+              - "http://localhost:8080"
+            allowedmethods: 
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedheaders: "*"
+            allowcredentials: true
+
+  # Redis Configuration (for future rate limiting)
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+
+# Actuator Configuration for Health Checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging Configuration
+logging:
+  level:
+    '[org.springframework.cloud.gateway]': INFO
+    '[live.alinmiron.beamerparts.api_gateway]': DEBUG
+    '[org.springframework.web]': DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Application Properties
+beamerparts:
+  gateway:
+    # Service URLs (using localhost for local development)
+    services:
+      user-service: "http://localhost:8081"
+      vehicle-service: "http://localhost:8082"
+      product-service: "http://localhost:8083"
+      order-service: "http://localhost:8084"

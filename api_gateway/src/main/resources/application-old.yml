@@ -1,0 +1,408 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  
+  # Basic Gateway Configuration  
+  cloud:
+    gateway:
+      # All routes now configured in Java (GatewayConfig.java)
+      # This prevents conflicts between YAML and Java configuration
+            
+        - id: auth-login-v1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/auth/login
+          filters:
+            - RewritePath=/api/v1/auth/login, /internal/auth/login
+            
+        - id: auth-refresh-v1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/auth/refresh
+          filters:
+            - RewritePath=/api/v1/auth/refresh, /internal/auth/refresh-token
+            
+        - id: auth-logout-v1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/auth/logout
+          filters:
+            - RewritePath=/api/v1/auth/logout, /internal/auth/logout
+            
+        - id: auth-me-v1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/auth/me
+          filters:
+            - RewritePath=/api/v1/auth/me, /internal/auth/validate-token
+
+        # Vehicle Management v1 (proxied to Vehicle Service)
+        - id: vehicles-series-v1
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/vehicles/series
+          filters:
+            - RewritePath=/api/v1/vehicles/series, /internal/series
+            
+        - id: vehicles-series-generations-v1
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/vehicles/series/{seriesCode}/generations
+          filters:
+            - RewritePath=/api/v1/vehicles/series/(?<seriesCode>.*)/generations, /internal/series/$\{seriesCode}/generations
+            
+        - id: vehicles-generation-v1
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/vehicles/generations/{generationCode}
+          filters:
+            - RewritePath=/api/v1/vehicles/generations/(?<generationCode>.*), /internal/generations/$\{generationCode}
+            
+        - id: vehicles-generation-products-v1
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/vehicles/generations/{generationCode}/products
+          filters:
+            - RewritePath=/api/v1/vehicles/generations/(?<generationCode>.*)/products, /internal/compatibility/$\{generationCode}/products
+
+        # Product Catalog v1 (proxied to Product Service)
+        - id: products-list-v1
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/products
+          filters:
+            - RewritePath=/api/v1/products, /internal/products
+            
+        - id: products-by-sku-v1
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/products/{sku}
+          filters:
+            - RewritePath=/api/v1/products/(?<sku>.*), /internal/products/$\{sku}
+            
+        - id: products-search-v1
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/products/search
+          filters:
+            - RewritePath=/api/v1/products/search, /internal/products/search
+            
+        - id: categories-list-v1
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/categories
+          filters:
+            - RewritePath=/api/v1/categories, /internal/categories
+            
+        - id: categories-products-v1
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/categories/{id}/products
+          filters:
+            - RewritePath=/api/v1/categories/(?<id>.*)/products, /internal/categories/$\{id}/products
+
+        # Shopping Cart v1 (proxied to User Service with JWT user context)
+        - id: cart-get-v1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/cart
+            - Method=GET
+          filters:
+            - UserContext  # Extract user ID from JWT and add to headers
+            - RewritePath=/api/v1/cart, /internal/cart
+            
+        - id: cart-add-item-v1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/cart/items
+            - Method=POST
+          filters:
+            - UserContext  # Extract user ID from JWT and add to headers
+            - RewritePath=/api/v1/cart/items, /internal/cart/items
+            
+        - id: cart-update-item-v1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/cart/items/{itemId}
+            - Method=PUT
+          filters:
+            - UserContext  # Extract user ID from JWT and add to headers
+            - RewritePath=/api/v1/cart/items/(?<itemId>.*), /internal/cart/items/$\{itemId}
+            
+        - id: cart-delete-item-v1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/cart/items/{itemId}
+            - Method=DELETE
+          filters:
+            - UserContext  # Extract user ID from JWT and add to headers
+            - RewritePath=/api/v1/cart/items/(?<itemId>.*), /internal/cart/items/$\{itemId}
+            
+        - id: cart-clear-v1
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/cart/clear
+            - Method=DELETE
+          filters:
+            - UserContext  # Extract user ID from JWT and add to headers
+            - RewritePath=/api/v1/cart/clear, /internal/cart/clear
+
+        # =============================================================================
+        # Convenience Routes (Unversioned - Point to Latest Version)
+        # =============================================================================
+        
+        # Authentication Convenience Routes
+        - id: auth-register-latest
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/register
+          filters:
+            - RewritePath=/api/auth/register, /internal/auth/register
+            
+        - id: auth-login-latest
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/login
+          filters:
+            - RewritePath=/api/auth/login, /internal/auth/login
+            
+        - id: auth-refresh-latest
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/refresh
+          filters:
+            - RewritePath=/api/auth/refresh, /internal/auth/refresh-token
+            
+        - id: auth-logout-latest
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/logout
+          filters:
+            - RewritePath=/api/auth/logout, /internal/auth/logout
+            
+        - id: auth-me-latest
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/me
+          filters:
+            - RewritePath=/api/auth/me, /internal/auth/validate-token
+
+        # Vehicle Management Convenience Routes
+        - id: vehicles-series-latest
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/vehicles/series
+          filters:
+            - RewritePath=/api/vehicles/series, /internal/series
+            
+        - id: vehicles-series-generations-latest
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/vehicles/series/{seriesCode}/generations
+          filters:
+            - RewritePath=/api/vehicles/series/(?<seriesCode>.*)/generations, /internal/series/$\{seriesCode}/generations
+            
+        - id: vehicles-generation-latest
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/vehicles/generations/{generationCode}
+          filters:
+            - RewritePath=/api/vehicles/generations/(?<generationCode>.*), /internal/generations/$\{generationCode}
+            
+        - id: vehicles-generation-products-latest
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/vehicles/generations/{generationCode}/products
+          filters:
+            - RewritePath=/api/vehicles/generations/(?<generationCode>.*)/products, /internal/compatibility/$\{generationCode}/products
+
+        # Product Catalog Convenience Routes
+        - id: products-list-latest
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/products
+          filters:
+            - RewritePath=/api/products, /internal/products
+            
+        - id: products-by-sku-latest
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/products/{sku}
+          filters:
+            - RewritePath=/api/products/(?<sku>.*), /internal/products/$\{sku}
+            
+        - id: products-search-latest
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/products/search
+          filters:
+            - RewritePath=/api/products/search, /internal/products/search
+            
+        - id: categories-list-latest
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/categories
+          filters:
+            - RewritePath=/api/categories, /internal/categories
+            
+        - id: categories-products-latest
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/categories/{id}/products
+          filters:
+            - RewritePath=/api/categories/(?<id>.*)/products, /internal/categories/$\{id}/products
+
+        # Shopping Cart Convenience Routes (with JWT user context)
+        - id: cart-get-latest
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/cart
+            - Method=GET
+          filters:
+            - UserContext  # Extract user ID from JWT and add to headers
+            - RewritePath=/api/cart, /internal/cart
+            
+        - id: cart-add-item-latest
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/cart/items
+            - Method=POST
+          filters:
+            - UserContext  # Extract user ID from JWT and add to headers
+            - RewritePath=/api/cart/items, /internal/cart/items
+            
+        - id: cart-update-item-latest
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/cart/items/{itemId}
+            - Method=PUT
+          filters:
+            - UserContext  # Extract user ID from JWT and add to headers
+            - RewritePath=/api/cart/items/(?<itemId>.*), /internal/cart/items/$\{itemId}
+            
+        - id: cart-delete-item-latest
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/cart/items/{itemId}
+            - Method=DELETE
+          filters:
+            - UserContext  # Extract user ID from JWT and add to headers
+            - RewritePath=/api/cart/items/(?<itemId>.*), /internal/cart/items/$\{itemId}
+            
+        - id: cart-clear-latest
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/cart/clear
+            - Method=DELETE
+          filters:
+            - UserContext  # Extract user ID from JWT and add to headers
+            - RewritePath=/api/cart/clear, /internal/cart/clear
+
+        # =============================================================================
+        # Admin Routes (Versioned)
+        # =============================================================================
+        
+        - id: admin-products-create-v1
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/admin/products
+            - Method=POST
+          filters:
+            - RewritePath=/api/v1/admin/products, /internal/products
+            
+        - id: admin-products-update-v1
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/admin/products/{sku}
+            - Method=PUT
+          filters:
+            - RewritePath=/api/v1/admin/products/(?<sku>.*), /internal/products/$\{sku}
+            
+        - id: admin-vehicles-create-v1
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/admin/vehicles
+            - Method=POST
+          filters:
+            - RewritePath=/api/v1/admin/vehicles, /internal/series
+            
+        # Health & Monitoring (for development/testing)
+        - id: health-user
+          uri: http://localhost:8081
+          predicates:
+            - Path=/health/user/**
+          filters:
+            - RewritePath=/health/user/(?<segment>.*), /$\{segment}
+        
+        - id: health-vehicle
+          uri: http://localhost:8082
+          predicates:
+            - Path=/health/vehicle/**
+          filters:
+            - RewritePath=/health/vehicle/(?<segment>.*), /$\{segment}
+        
+        - id: health-product
+          uri: http://localhost:8083
+          predicates:
+            - Path=/health/product/**
+          filters:
+            - RewritePath=/health/product/(?<segment>.*), /$\{segment}
+          
+          # Global CORS Configuration
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedorigins: 
+                  - "http://localhost:3000"
+                  - "http://localhost:4200"
+                  - "http://localhost:8080"
+                allowedmethods: 
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedheaders: "*"
+                allowcredentials: true
+
+  # Redis Configuration (for future rate limiting)
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+
+# Actuator Configuration for Health Checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging Configuration
+logging:
+  level:
+    '[org.springframework.cloud.gateway]': INFO
+    '[live.alinmiron.beamerparts.api_gateway]': DEBUG
+    '[org.springframework.web]': DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Application Properties
+beamerparts:
+  gateway:
+    # Service URLs (using localhost for local development)
+    services:
+      user-service: "http://localhost:8081"
+      vehicle-service: "http://localhost:8082"
+      product-service: "http://localhost:8083"
+      order-service: "http://localhost:8084"
