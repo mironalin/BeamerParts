@@ -41,8 +41,8 @@ else
     if command -v mvn >/dev/null 2>&1; then
         mvn test
     else
-        # Borrow mvnw from user_service
-        "$PROJECT_ROOT/user_service/mvnw" -f pom.xml test
+        # Borrow mvnw from user-service
+        "$PROJECT_ROOT/user-service/mvnw" -f pom.xml test
     fi
 fi
 if [ $? -eq 0 ]; then
@@ -53,7 +53,7 @@ else
 fi
 
 # List of services to test
-services=("api_gateway" "user_service" "vehicle_service" "product_service" "order_service")
+services=("api-gateway" "user-service" "vehicle-service" "product-service" "order-service")
 
 echo -e "\n${BLUE}🧪 Running tests for all services...${NC}"
 

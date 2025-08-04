@@ -27,7 +27,7 @@ if lsof -i :8083 > /dev/null 2>&1; then
 fi
 
 # Navigate to Product Service directory
-cd "$PROJECT_ROOT/product_service"
+cd "$PROJECT_ROOT/product-service"
 
 # Build and run
 echo -e "${YELLOW}🔨 Building and starting Product Service...${NC}"

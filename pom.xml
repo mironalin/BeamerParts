@@ -31,11 +31,11 @@
 
     <modules>
         <module>shared</module>
-        <module>api_gateway</module>
-        <module>user_service</module>
-        <module>vehicle_service</module>
-        <module>product_service</module>
-        <module>order_service</module>
+        <module>api-gateway</module>
+        <module>user-service</module>
+        <module>vehicle-service</module>
+        <module>product-service</module>
+        <module>order-service</module>
     </modules>
 
     <dependencyManagement>

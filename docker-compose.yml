@@ -55,7 +55,7 @@ services:
   user-service:
     build: 
       context: .
-      dockerfile: user_service/Dockerfile
+      dockerfile: user-service/Dockerfile
     ports:
       - "8081:8081"
     environment:
@@ -80,7 +80,7 @@ services:
   vehicle-service:
     build: 
       context: .
-      dockerfile: vehicle_service/Dockerfile
+      dockerfile: vehicle-service/Dockerfile
     ports:
       - "8082:8082"
     environment:
@@ -101,7 +101,7 @@ services:
   product-service:
     build: 
       context: .
-      dockerfile: product_service/Dockerfile
+      dockerfile: product-service/Dockerfile
     ports:
       - "8083:8083"
     environment:
@@ -125,7 +125,7 @@ services:
   api-gateway:
     build: 
       context: .
-      dockerfile: api_gateway/Dockerfile
+      dockerfile: api-gateway/Dockerfile
     ports:
       - "8080:8080"
     environment:

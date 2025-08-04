@@ -27,7 +27,7 @@ if lsof -i :8082 > /dev/null 2>&1; then
 fi
 
 # Navigate to Vehicle Service directory
-cd "$PROJECT_ROOT/vehicle_service"
+cd "$PROJECT_ROOT/vehicle-service"
 
 # Build and run
 echo -e "${YELLOW}🔨 Building and starting Vehicle Service...${NC}"

@@ -102,11 +102,11 @@ curl http://localhost:8080/actuator/health
 
 ```
 BeamerParts/
-├── 📁 api_gateway/          # Spring Cloud Gateway (Port 8080)
-├── 📁 user_service/         # User management & auth (Port 8081)
-├── 📁 vehicle_service/      # BMW vehicle data (Port 8082)  
-├── 📁 product_service/      # Product catalog (Port 8083)
-├── 📁 order_service/        # Order management (Port 8084)
+├── 📁 api-gateway/          # Spring Cloud Gateway (Port 8080)
+├── 📁 user-service/         # User management & auth (Port 8081)
+├── 📁 vehicle-service/      # BMW vehicle data (Port 8082)  
+├── 📁 product-service/      # Product catalog (Port 8083)
+├── 📁 order-service/        # Order management (Port 8084)
 ├── 📁 shared/               # Common libraries and utilities
 ├── 📁 scripts/              # Development and deployment scripts
 ├── 📁 docs/                 # Project documentation

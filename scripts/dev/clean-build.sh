@@ -41,8 +41,8 @@ else
     if command -v mvn >/dev/null 2>&1; then
         mvn clean install
     else
-        # Borrow mvnw from user_service
-        "$PROJECT_ROOT/user_service/mvnw" -f pom.xml clean install
+        # Borrow mvnw from user-service
+        "$PROJECT_ROOT/user-service/mvnw" -f pom.xml clean install
     fi
 fi
 if [ $? -eq 0 ]; then
@@ -53,7 +53,7 @@ else
 fi
 
 # List of services to build
-services=("api_gateway" "user_service" "vehicle_service" "product_service" "order_service")
+services=("api-gateway" "user-service" "vehicle-service" "product-service" "order-service")
 
 echo -e "\n${BLUE}🏗️ Building all services...${NC}"
 

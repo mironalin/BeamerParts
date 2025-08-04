@@ -45,7 +45,7 @@ shared/
 Each service includes the shared module as a dependency:
 ```xml
 <dependency>
-    <groupId>com.beamerparts</groupId>
+    <groupId>live.alinmiron.beamerparts</groupId>
     <artifactId>shared</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -94,7 +94,7 @@ Each service includes the shared module as a dependency:
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.beamerparts</groupId>
+    <groupId>live.alinmiron.beamerparts</groupId>
     <artifactId>beamerparts-platform</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
@@ -183,7 +183,7 @@ Each service includes the shared module as a dependency:
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>com.beamerparts</groupId>
+        <groupId>live.alinmiron.beamerparts</groupId>
         <artifactId>beamerparts-platform</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -239,7 +239,7 @@ Each service includes the shared module as a dependency:
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>com.beamerparts</groupId>
+        <groupId>live.alinmiron.beamerparts</groupId>
         <artifactId>beamerparts-platform</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -251,7 +251,7 @@ Each service includes the shared module as a dependency:
     <dependencies>
         <!-- Shared Module -->
         <dependency>
-            <groupId>com.beamerparts</groupId>
+            <groupId>live.alinmiron.beamerparts</groupId>
             <artifactId>shared</artifactId>
             <version>1.0.0</version>
         </dependency>
@@ -374,7 +374,7 @@ Each service includes the shared module as a dependency:
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>com.beamerparts</groupId>
+        <groupId>live.alinmiron.beamerparts</groupId>
         <artifactId>beamerparts-platform</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -386,7 +386,7 @@ Each service includes the shared module as a dependency:
     <dependencies>
         <!-- Shared Module -->
         <dependency>
-            <groupId>com.beamerparts</groupId>
+            <groupId>live.alinmiron.beamerparts</groupId>
             <artifactId>shared</artifactId>
             <version>1.0.0</version>
         </dependency>
@@ -539,7 +539,7 @@ Each service includes the shared module as a dependency:
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>com.beamerparts</groupId>
+        <groupId>live.alinmiron.beamerparts</groupId>
         <artifactId>beamerparts-platform</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -551,7 +551,7 @@ Each service includes the shared module as a dependency:
     <dependencies>
         <!-- Shared Module -->
         <dependency>
-            <groupId>com.beamerparts</groupId>
+            <groupId>live.alinmiron.beamerparts</groupId>
             <artifactId>shared</artifactId>
             <version>1.0.0</version>
         </dependency>
@@ -669,7 +669,7 @@ Each service includes the shared module as a dependency:
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>com.beamerparts</groupId>
+        <groupId>live.alinmiron.beamerparts</groupId>
         <artifactId>beamerparts-platform</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -681,7 +681,7 @@ Each service includes the shared module as a dependency:
     <dependencies>
         <!-- Shared Module -->
         <dependency>
-            <groupId>com.beamerparts</groupId>
+            <groupId>live.alinmiron.beamerparts</groupId>
             <artifactId>shared</artifactId>
             <version>1.0.0</version>
         </dependency>
@@ -839,7 +839,7 @@ Each service includes the shared module as a dependency:
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>com.beamerparts</groupId>
+        <groupId>live.alinmiron.beamerparts</groupId>
         <artifactId>beamerparts-platform</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -851,7 +851,7 @@ Each service includes the shared module as a dependency:
     <dependencies>
         <!-- Shared Module -->
         <dependency>
-            <groupId>com.beamerparts</groupId>
+            <groupId>live.alinmiron.beamerparts</groupId>
             <artifactId>shared</artifactId>
             <version>1.0.0</version>
         </dependency>

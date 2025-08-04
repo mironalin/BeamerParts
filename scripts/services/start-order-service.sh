@@ -27,7 +27,7 @@ if lsof -i :8084 > /dev/null 2>&1; then
 fi
 
 # Navigate to Order Service directory
-cd "$PROJECT_ROOT/order_service"
+cd "$PROJECT_ROOT/order-service"
 
 # Build and run
 echo -e "${YELLOW}🔨 Building and starting Order Service...${NC}"

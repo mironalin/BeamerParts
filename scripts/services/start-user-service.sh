@@ -27,7 +27,7 @@ if lsof -i :8081 > /dev/null 2>&1; then
 fi
 
 # Navigate to User Service directory
-cd "$PROJECT_ROOT/user_service"
+cd "$PROJECT_ROOT/user-service"
 
 # Build and run
 echo -e "${YELLOW}🔨 Building and starting User Service...${NC}"

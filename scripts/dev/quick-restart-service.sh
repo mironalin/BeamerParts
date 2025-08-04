@@ -104,11 +104,11 @@ echo ""
 if [[ $# -eq 1 ]]; then
     # Service specified as argument
     case $1 in
-        "user"|"1") restart_service "user_service" "User" 8081 ;;
-        "vehicle"|"2") restart_service "vehicle_service" "Vehicle" 8082 ;;
-        "product"|"3") restart_service "product_service" "Product" 8083 ;;
-        "order"|"4") restart_service "order_service" "Order" 8084 ;;
-        "gateway"|"api"|"5") restart_service "api_gateway" "API-Gateway" 8080 ;;
+        "user"|"1") restart_service "user-service" "User" 8081 ;;
+        "vehicle"|"2") restart_service "vehicle-service" "Vehicle" 8082 ;;
+        "product"|"3") restart_service "product-service" "Product" 8083 ;;
+        "order"|"4") restart_service "order-service" "Order" 8084 ;;
+        "gateway"|"api"|"5") restart_service "api-gateway" "API-Gateway" 8080 ;;
         *) echo -e "${RED}❌ Unknown service: $1${NC}"; exit 1 ;;
     esac
 else
@@ -117,11 +117,11 @@ else
     read -p "Select service to restart [1-5]: " choice
     
     case $choice in
-        1) restart_service "user_service" "User" 8081 ;;
-        2) restart_service "vehicle_service" "Vehicle" 8082 ;;
-        3) restart_service "product_service" "Product" 8083 ;;
-        4) restart_service "order_service" "Order" 8084 ;;
-        5) restart_service "api_gateway" "API-Gateway" 8080 ;;
+        1) restart_service "user-service" "User" 8081 ;;
+        2) restart_service "vehicle-service" "Vehicle" 8082 ;;
+        3) restart_service "product-service" "Product" 8083 ;;
+        4) restart_service "order-service" "Order" 8084 ;;
+        5) restart_service "api-gateway" "API-Gateway" 8080 ;;
         *) echo -e "${RED}❌ Invalid option${NC}"; exit 1 ;;
     esac
 fi

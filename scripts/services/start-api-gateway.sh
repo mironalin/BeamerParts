@@ -27,7 +27,7 @@ if lsof -i :8080 > /dev/null 2>&1; then
 fi
 
 # Navigate to API Gateway directory
-cd "$PROJECT_ROOT/api_gateway"
+cd "$PROJECT_ROOT/api-gateway"
 
 # Build and run
 echo -e "${YELLOW}🔨 Building and starting API Gateway...${NC}"

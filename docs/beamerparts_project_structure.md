@@ -313,7 +313,7 @@ beamerparts-infrastructure/ (Docker Compose, K8s manifests)
 #### User Service Application
 ```java
 // user-service/src/main/java/com/beamerparts/user/UserServiceApplication.java
-package com.beamerparts.user;
+package live.alinmiron.beamerparts.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -335,7 +335,7 @@ public class UserServiceApplication {
 #### Vehicle Service Application
 ```java
 // vehicle-service/src/main/java/com/beamerparts/vehicle/VehicleServiceApplication.java
-package com.beamerparts.vehicle;
+package live.alinmiron.beamerparts.vehicle;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -355,7 +355,7 @@ public class VehicleServiceApplication {
 #### Product Service Application
 ```java
 // product-service/src/main/java/com/beamerparts/product/ProductServiceApplication.java
-package com.beamerparts.product;
+package live.alinmiron.beamerparts.product;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -379,7 +379,7 @@ public class ProductServiceApplication {
 #### API Gateway Application
 ```java
 // api-gateway/src/main/java/com/beamerparts/gateway/GatewayApplication.java
-package com.beamerparts.gateway;
+package live.alinmiron.beamerparts.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -463,7 +463,7 @@ management:
 
 logging:
   level:
-    com.beamerparts.user: DEBUG
+    live.alinmiron.beamerparts.user: DEBUG
     org.springframework.web: INFO
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level [%logger{36}] - %msg%n"
@@ -514,7 +514,7 @@ management:
 
 logging:
   level:
-    com.beamerparts.vehicle: DEBUG
+    live.alinmiron.beamerparts.vehicle: DEBUG
 ```
 
 ### Product Service Configuration
@@ -576,7 +576,7 @@ management:
 
 logging:
   level:
-    com.beamerparts.product: DEBUG
+    live.alinmiron.beamerparts.product: DEBUG
 ```
 
 ### API Gateway Configuration
@@ -660,7 +660,7 @@ management:
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
-    com.beamerparts.gateway: DEBUG
+    live.alinmiron.beamerparts.gateway: DEBUG
 ```
 
 ## Docker Configuration Per Service

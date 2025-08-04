@@ -188,20 +188,20 @@ echo ""
 echo -e "${PURPLE}📋 Phase 3: Starting services...${NC}"
 
 # Start core services first
-start_service_bg "user_service" "User-Service" 8081
+start_service_bg "user-service" "User-Service" 8081
 wait_for_service "User Service" 8081
 
-start_service_bg "vehicle_service" "Vehicle-Service" 8082  
+start_service_bg "vehicle-service" "Vehicle-Service" 8082  
 wait_for_service "Vehicle Service" 8082
 
-start_service_bg "product_service" "Product-Service" 8083
+start_service_bg "product-service" "Product-Service" 8083
 wait_for_service "Product Service" 8083
 
-# start_service_bg "order_service" "Order-Service" 8084
+# start_service_bg "order-service" "Order-Service" 8084
 # wait_for_service "Order Service" 8084
 
 # Start API Gateway last
-start_service_bg "api_gateway" "API-Gateway" 8080
+start_service_bg "api-gateway" "API-Gateway" 8080
 wait_for_service "API Gateway" 8080
 
 echo ""
