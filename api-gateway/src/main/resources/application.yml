@@ -4,6 +4,15 @@ server:
 spring:
   application:
     name: api-gateway
+  profiles:
+    active: neon
+
+---
+# Default profile (Docker/Local development)
+spring:
+  config:
+    activate:
+      on-profile: default
   
   # Basic Gateway Configuration - Routes defined in Java (GatewayConfig.java)
   cloud:
@@ -53,6 +62,81 @@ logging:
     '[org.springframework.cloud.gateway]': INFO
     '[live.alinmiron.beamerparts.api_gateway]': DEBUG
     '[org.springframework.web]': DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Application Properties
+beamerparts:
+  gateway:
+    # Service URLs (using localhost for local development)
+    services:
+      user-service: "http://localhost:8081"
+      vehicle-service: "http://localhost:8082"
+      product-service: "http://localhost:8083"
+      order-service: "http://localhost:8084"
+
+---
+# Neon profile (Cloud services)
+spring:
+  config:
+    activate:
+      on-profile: neon
+  
+  # Basic Gateway Configuration - Routes defined in Java (GatewayConfig.java)
+  cloud:
+    gateway:
+      # Global CORS Configuration
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedorigins: 
+              - "http://localhost:3000"
+              - "http://localhost:4200"
+              - "http://localhost:8080"
+            allowedmethods: 
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedheaders: "*"
+            allowcredentials: true
+
+  # Redis Configuration (for future rate limiting)
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      timeout: 5000ms
+      ssl:
+        enabled: true
+      lettuce:
+        pool:
+          max-active: 2
+          max-idle: 2
+          min-idle: 0
+
+# Actuator Configuration for Health Checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      access: unrestricted
+
+# Logging Configuration
+logging:
+  level:
+    '[org.springframework.cloud.gateway]': INFO
+    '[live.alinmiron.beamerparts.api_gateway]': INFO
+    '[org.springframework.web]': INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 

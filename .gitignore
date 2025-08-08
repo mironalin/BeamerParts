@@ -1,1 +1,25 @@
 .DS_Store
+
+# Environment variables (sensitive data)
+.env
+.env.local
+.env.production
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Build artifacts
+target/
+*.jar
+*.war
+
+# Logs
+*.log
+logs/
+
+# Docker volumes (if any)
+postgres_data/
+redis_data/
+rabbitmq_data/
