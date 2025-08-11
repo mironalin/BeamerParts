@@ -23,7 +23,6 @@
         <stripe.version>29.4.0</stripe.version>
         <itext.version>5.5.13.4</itext.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <hibernate-types.version>2.21.1</hibernate-types.version>
         <thumbnailator.version>0.4.20</thumbnailator.version>
         <commons-fileupload.version>1.6.0</commons-fileupload.version>
     </properties>
