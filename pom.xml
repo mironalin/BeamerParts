@@ -26,7 +26,6 @@
         <hibernate-types.version>2.21.1</hibernate-types.version>
         <thumbnailator.version>0.4.20</thumbnailator.version>
         <commons-fileupload.version>1.6.0</commons-fileupload.version>
-        <hibernate-search.version>8.1.0.Final</hibernate-search.version>
     </properties>
 
     <modules>
