@@ -29,8 +29,11 @@ start_service_bg() {
     bash "$service_script" > "$log_file" 2>&1 &
     local pid=$!
     
+    # Convert service name to lowercase using tr
+    local service_name_lower=$(echo "$service_name" | tr '[:upper:]' '[:lower:]')
+    
     # Store PID for later cleanup
-    echo $pid > "$PROJECT_ROOT/logs/${service_name,,}.pid"
+    echo $pid > "$PROJECT_ROOT/logs/${service_name_lower}.pid"
     
     echo -e "${YELLOW}📝 $service_name logs: $log_file${NC}"
     echo -e "${YELLOW}🔢 $service_name PID: $pid${NC}"
