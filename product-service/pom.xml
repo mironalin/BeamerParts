@@ -56,11 +56,16 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Search Engine -->
+		<!-- Search Engine - Hibernate Search with Lucene Backend -->
 		<dependency>
 			<groupId>org.hibernate.search</groupId>
 			<artifactId>hibernate-search-mapper-orm</artifactId>
-			<version>${hibernate-search.version}</version>
+			<version>7.1.0.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.search</groupId>
+			<artifactId>hibernate-search-backend-lucene</artifactId>
+			<version>7.1.0.Final</version>
 		</dependency>
 
 		<!-- File Upload & Image Processing -->
