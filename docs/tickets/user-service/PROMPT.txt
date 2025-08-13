@@ -1,0 +1,96 @@
+🔐 USER SERVICE DEVELOPMENT PROMPT
+You are developing the User Service for BeamerParts, a BMW parts e-commerce platform.
+
+📋 SERVICE OVERVIEW
+- Service: user-service (port 8081)
+- Database: PostgreSQL user_db (port 5433) 
+- Dependencies: Redis (6379), RabbitMQ (5672), JWT authentication
+- Role: Authentication, authorization, cart management, user profiles
+
+📦 CURRENT STATE
+✅ FOUNDATION COMPLETE:
+- Entities: User, CartItem, UserVehicle, UserRefreshToken + repositories
+- Database: Complete Flyway migrations with constraints
+- Configuration: JWT, Redis, RabbitMQ, security settings
+- DTOs: Basic request/response structures
+
+🚧 TO IMPLEMENT:
+- Domain services (AuthenticationDomainService, CartDomainService)
+- Internal services (UserInternalService, CartInternalService)
+- Controllers (external, internal, admin with OpenAPI)
+- Security layer (JWT, BCrypt, role-based authorization)
+- MapStruct mappers with real-time data integration
+- Comprehensive test suite (85%+ coverage target)
+
+🎯 IMPLEMENTATION STRATEGY
+PHASE: Start with US-M0-external-apis (Authentication & Cart APIs)
+APPROACH: Strategic TDD - Security/cart logic requires tests FIRST (TIER 1)
+REFERENCE: product-service proven patterns (92.38% coverage achieved)
+STANDARDS: Follow .cursorrules methodology exactly
+
+🔑 CRITICAL BUSINESS LOGIC
+- JWT authentication with BCrypt (12 rounds), refresh token rotation
+- Role-based authorization: CUSTOMER, ADMIN, SUPER_ADMIN with method-level security
+- Shopping cart with real-time inventory validation via product-service
+- User BMW vehicle management with vehicle-service compatibility validation
+- Account lockout (5 attempts, 30min lockout) and rate limiting
+- Guest-to-user cart migration and account linking
+
+🧪 TESTING REQUIREMENTS (Security Critical - Highest Priority)
+- Domain Services: @SpringBootTest + @Transactional, 90%+ coverage
+- Controllers: @WebMvcTest + @Import({RealMappers}), 75%+ coverage
+- Entities: Business logic with timestamp-based unique data
+- Security: All auth flows, JWT validation, role enforcement
+- Integration: Real repositories/mappers, mock only external services
+
+🔗 SERVICE INTEGRATIONS
+- Product Service: /internal/inventory/check (cart validation)
+- Vehicle Service: /internal/compatibility/validate (BMW compatibility)  
+- Order Service: Cart-to-order conversion during checkout
+- Event Publishing: User registration, cart changes, vehicle updates
+
+📁 PACKAGE STRUCTURE (BeamerParts Standard)
+src/main/java/live/alinmiron/beamerparts/user/
+├── controller/external/     # /api/auth, /api/cart (via gateway)
+├── controller/internal/     # /internal/users, /internal/cart
+├── controller/admin/        # /api/admin/users
+├── service/domain/          # AuthenticationDomainService, CartDomainService
+├── service/internal/        # UserInternalService, CartInternalService
+├── security/               # JWT, password, authorization
+├── mapper/                 # MapStruct with real-time data
+├── entity/                 # ✅ User, CartItem, UserVehicle
+├── repository/             # ✅ Spring Data JPA repositories
+├── dto/                    # ✅ Basic DTOs + comprehensive additions
+└── exception/              # Custom exceptions + GlobalExceptionHandler
+
+🚀 STEP-BY-STEP EXECUTION
+1. Read docs/tickets/user-service/US-M0-external-apis.md (full requirements)
+2. Read docs/tickets/user-service/BUSINESS-LOGIC.md (domain expertise)
+3. IMPLEMENT AuthenticationDomainService with TDD (tests FIRST)
+4. CREATE external authentication controllers (/api/auth endpoints)
+5. IMPLEMENT cart management with product-service integration
+6. ADD security layer with JWT and role-based authorization
+7. CREATE mappers with real-time inventory/compatibility data
+8. ACHIEVE 85%+ test coverage with security focus
+
+📚 REFERENCE MATERIALS
+Essential Reading:
+- .cursorrules - Testing standards and architectural patterns
+- docs/tickets/user-service/BUSINESS-LOGIC.md - Authentication & cart logic
+- docs/tickets/user-service/DEVELOPMENT-CONTEXT.md - Service architecture
+- product-service/ - Proven testing patterns (92.38% coverage)
+- docs/beamerparts_api_contract.md - API contract specifications
+
+🎯 SUCCESS CRITERIA
+- M0 phase complete with 85%+ coverage
+- All critical authentication paths tested and secure
+- Cart management with real-time validation working
+- Service-to-service integration ready for order processing
+- JWT authentication robust with proper security measures
+
+💡 KEY REMINDERS
+- Security is CRITICAL - test every auth scenario
+- Use Strategic TDD for TIER 1 components (auth, cart)
+- Follow product-service patterns exactly
+- Real repositories/mappers in tests, mock external services only
+- Timestamp-based unique test data to prevent constraint violations
