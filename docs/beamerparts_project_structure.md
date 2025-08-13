@@ -1,3 +1,42 @@
+> NOTE: Updated structure and conventions are summarized below. This file contains a comprehensive legacy reference; prefer `docs/beamerparts_development_guide.md` and `.cursorrules` for current standards.
+
+## Updated Service Structure (Authoritative Summary)
+
+Each service follows this canonical layout (see product-service for examples):
+
+- `controller/`
+  - `external/` – public APIs via gateway
+  - `admin/` – admin-only APIs via gateway
+  - `internal/` – service-to-service APIs (direct)
+  - `...OpenApiSpec` – spec classes colocated with external/admin controllers
+- `service/`
+  - `external/` – business logic for external/admin
+  - `internal/` – business logic for internal
+- `dto/`
+  - `external/request|response/`
+  - `internal/request|response/`
+  - `shared/` – wrappers (e.g., `ApiResponse`)
+- `repository/` – Spring Data JPA
+- `entity/` – JPA entities (aligned to Flyway)
+- `mapper/` – MapStruct mappers (entity↔DTO)
+- `exception/` – exceptions + `GlobalExceptionHandler` (`@ControllerAdvice`)
+- `client/` – HTTP clients for other services
+- `config/` – security, cache, rabbit, resilience
+- `event/` – publishers/listeners
+- `resources/db/migration` – Flyway migrations `V{major}_{minor}__Description.sql`
+
+Rollout stages (see `.cursorrules`)
+- M0 Basic: external+internal APIs, validation, persistence, health
+- M1 Messaging: RabbitMQ events/listeners
+- M2 Caching & Resilience: Redis caches; Resilience4j (CB/retry/timeout)
+- M3 Admin/Advanced: admin APIs, payments/invoices, advanced features
+
+OpenAPI policy
+- External/Admin: `*OpenApiSpec` classes provide summaries/descriptions/params; controllers stay thin
+- Internal: minimal `@Operation` summaries initially; expand later
+
+---
+
 # BeamerParts - Microservices Project Structure Guide
 
 ## Overview
@@ -171,7 +210,16 @@ beamerparts-platform/
 │   │   │   │       ├── controller/
 │   │   │   │       │   ├── ProductController.java
 │   │   │   │       │   ├── CategoryController.java
-│   │   │   │       │   └── InventoryController.java
+│   │   │   │       │   ├── InventoryController.java
+│   │   │   │       │   └── admin/
+│   │   │   │       │       ├── AdminProductController.java
+│   │   │   │       │       ├── AdminCategoryController.java
+│   │   │   │       │       └── AdminInventoryController.java
+│   │   │   │       ├── openapi/
+│   │   │   │       │   ├── ProductControllerOpenApiSpec.java
+│   │   │   │       │   ├── AdminProductControllerOpenApiSpec.java
+│   │   │   │       │   ├── AdminCategoryControllerOpenApiSpec.java
+│   │   │   │       │   └── AdminInventoryControllerOpenApiSpec.java
 │   │   │   │       ├── service/
 │   │   │   │       │   ├── ProductCatalogService.java
 │   │   │   │       │   ├── InventoryService.java
