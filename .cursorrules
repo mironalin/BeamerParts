@@ -1,0 +1,261 @@
+### BeamerParts – Cursor Rules
+
+- **Repo type**: Java 21, Spring Boot 3.5.4, Spring Cloud 2025.0.0 microservices (monorepo)
+- **Modules**: `api-gateway`, `user-service`, `vehicle-service`, `product-service`, `order-service`, `shared`
+- **Infra (local)**: PostgreSQL (5433/5434/5435), Redis (6379), RabbitMQ (5672, mgmt 15672) via Docker Compose
+- **Build**: Maven Wrapper (`./mvnw`) at root and per-module
+- **Ports**: Gateway 8080, User 8081, Vehicle 8082, Product 8083, Order 8084
+
+### How to run (local dev)
+- **Start everything (recommended)**:
+  - `bash /Users/alinmiron/Downloads/BeamerParts/scripts/dev-start.sh` → Interactive menu
+  - Or non-interactive:
+    - `bash /Users/alinmiron/Downloads/BeamerParts/scripts/docker/start-infra.sh`
+    - `bash /Users/alinmiron/Downloads/BeamerParts/scripts/dev/start-all-services.sh`
+- **Start single service**:
+  - `bash /Users/alinmiron/Downloads/BeamerParts/scripts/services/start-user-service.sh`
+  - `bash /Users/alinmiron/Downloads/BeamerParts/scripts/services/start-vehicle-service.sh`
+  - `bash /Users/alinmiron/Downloads/BeamerParts/scripts/services/start-product-service.sh`
+  - `bash /Users/alinmiron/Downloads/BeamerParts/scripts/services/start-api-gateway.sh`
+  - `bash /Users/alinmiron/Downloads/BeamerParts/scripts/services/start-order-service.sh`
+- **Rebuild & restart all (keep infra)**: `bash /Users/alinmiron/Downloads/BeamerParts/scripts/dev/rebuild-restart-services.sh`
+- **Quick restart one service**: `bash /Users/alinmiron/Downloads/BeamerParts/scripts/dev/quick-restart-service.sh product|user|vehicle|order|gateway`
+- **Check status**: `bash /Users/alinmiron/Downloads/BeamerParts/scripts/dev/check-status.sh`
+- **Show logs**: `bash /Users/alinmiron/Downloads/BeamerParts/scripts/dev/show-all-logs.sh`
+- **Stop everything**: `bash /Users/alinmiron/Downloads/BeamerParts/scripts/dev/stop-all.sh`
+
+### Build, test, compose
+- **Clean build all**: `bash /Users/alinmiron/Downloads/BeamerParts/scripts/dev/clean-build.sh`
+- **Root build**: `/Users/alinmiron/Downloads/BeamerParts/mvnw clean install -DskipTests`
+- **Run tests (all)**: `bash /Users/alinmiron/Downloads/BeamerParts/scripts/dev/run-tests.sh`
+- **Infra only (compose)**:
+  - Up: `docker-compose -f /Users/alinmiron/Downloads/BeamerParts/docker-compose.infra.yml up -d`
+  - Down: `docker-compose -f /Users/alinmiron/Downloads/BeamerParts/docker-compose.infra.yml down`
+
+### Technology rollout stages
+- **M0 (Basic)**: External + internal APIs, validation, basic persistence, health.
+- **M1 (Messaging)**: RabbitMQ events and listeners; inter-service sync.
+- **M2 (Caching & Resilience)**: Redis caching on hot reads; circuit breakers/retries/timeouts for internal calls.
+- **M3 (Admin/Advanced)**: Admin APIs, payments/invoices, advanced features.
+
+### Testing policy (Domain-Driven + Test-Driven Development)
+- **Specification-First Testing**: Write business behavior tests before implementation. Tests define what the domain should do, not how it's implemented.
+- **Domain Tests**: Business logic verification using real scenarios, not mocks. Test domain services with actual business rules and edge cases.
+- **Test Types**:
+  - **Domain Specifications**: `@SpringBootTest + @Transactional` for business behavior and invariants
+  - **Integration Tests**: `@DataJpaTest` for repository behavior with real data  
+  - **Controller Tests**: `@WebMvcTest + @Import({Mappers})` for API contracts with real mapping logic
+  - **Entity Tests**: `@DataJpaTest` for business methods and relationship integrity
+  - **Strategic Mocking**: Mock only external service dependencies; use real components for internal logic
+- **Coverage targets**: ≥ 90% for domain services (critical business logic); ≥ 85% for entities with business methods; ≥ 70% overall service coverage.
+- **Coverage Analysis**: Use JaCoCo (`./mvnw jacoco:report`) for precise file-by-file metrics and gap identification.
+- **PR gate**: Do not merge without green `scripts/dev/run-tests.sh` and ≥90% domain service coverage.
+- **Test layout**: Mirror main packages under `src/test/java`; group by test type (controller, domain, integration, entity).
+
+### OpenAPI documentation rules
+- External and Admin controllers:
+  - Put method-level `@Operation` annotations in dedicated `*OpenApiSpec` classes placed alongside controllers (pattern as in `product-service`).
+  - Keep controllers thin and reference constants/descriptions from `*OpenApiSpec`.
+  - Include parameter descriptions/examples for path/query params in `*OpenApiSpec`.
+- Internal controllers:
+  - Minimal OpenAPI is acceptable initially; add concise `@Operation` summaries and parameter descriptions later (tracked by tickets).
+- Consistency:
+  - Use the same summary/description tone and naming across services.
+  - Update OpenAPI upon any contract change; do not drift from `docs/beamerparts_api_contract.md`.
+
+### Standard service structure (packages)
+- `controller/`
+  - `external/` – public APIs exposed via gateway
+  - `admin/` – admin-only APIs exposed via gateway
+  - `internal/` – service-to-service APIs (direct calls)
+  - `...OpenApiSpec` – spec classes colocated with external/admin controllers
+- `service/`
+  - `external/` – business logic for external/admin APIs
+  - `internal/` – business logic for internal APIs
+- `dto/`
+  - `external/request|response/`
+  - `internal/request|response/`
+  - `shared/` – shared API wrappers (e.g., `ApiResponse`)
+- `repository/` – Spring Data JPA repositories
+- `entity/` – JPA entities aligned with Flyway migrations
+- `mapper/` – MapStruct mappers (entity↔DTO)
+- `exception/` – exceptions + `GlobalExceptionHandler` (`@ControllerAdvice`)
+- `client/` – HTTP clients for other services (internal APIs)
+- `config/` – config classes (security, cache, rabbit, resilience)
+- `event/` – messaging publishers/listeners
+
+### Repo layout and conventions
+- Each service is an independent Spring Boot app with its own `pom.xml`, `src/main/java`, and `src/main/resources/application.yml`.
+- Typical package structure per service as above; mirror structure under `src/test/java` for tests.
+- DB migrations live under `src/main/resources/db/migration` with Flyway naming: `V{major}_{minor}__Description.sql` (e.g. `V1_10__Create_Stock_Reservations_Table.sql`).
+- Logs and PIDs: `logs/*.log`, `logs/*.pid` (do not commit).
+- Gateway routes are configured in `api-gateway` (see `application.yml` and gateway code).
+
+### Coding standards (Java)
+- **Language**: Java only (no Kotlin). Target Java 21.
+- **Dependencies**: Prefer BOM-managed versions; only pin versions already pinned in `pom.xml`.
+- **Naming**: Descriptive, full words. Classes end with clear roles: `*Controller`, `*Service`, `*Repository`, `*RequestDto`, `*ResponseDto`.
+- **Controllers**: `@RestController`, return typed DTOs. Keep request/response DTOs in `dto/.../request` and `dto/.../response` as seen in `product-service`.
+- **Domain Services**: Business logic lives in `@Service` classes in `service/domain/` package, not controllers. Controllers orchestrate, domain services contain business rules.
+- **Service Architecture**: 
+  - External/Admin Controllers → Domain Services directly (simple client-facing operations)
+  - Internal Controllers → Internal Services → Domain Services (service-to-service orchestration)
+  - Domain Services contain all business logic and rules
+- **Repositories**: Spring Data JPA interfaces in `repository`.
+- **Entities**: Rich domain models with business behavior, not just data. Keep schema in sync with Flyway.
+- **Validation**: Use Jakarta validation annotations on DTOs; validate at controller boundary. Domain invariants enforced in domain services.
+- **Errors**: Use consistent error responses; domain-specific exceptions with clear business messages; global exception handlers per service.
+- **Mapping**: MapStruct preferred for entity↔DTO; domain commands/events for internal communication.
+- **Security**: JWT auth flows live in `user-service` and `api-gateway` filters. Do not duplicate auth in other services.
+- **Caching & messaging**: Redis for cache (product) and RabbitMQ for async messaging. Use existing config keys.
+- **Resilience**: Use circuit breakers/retries/timeouts for internal clients (Resilience4j); set sensible defaults.
+- **Observability**: Expose Spring Actuator health; do not remove health endpoints.
+
+### API and routing
+- Public API is fronted by the gateway on `http://localhost:8080`.
+- Prefer versioned routes (`/api/v1/...`); convenience routes `/api/...` may forward to latest.
+- Health via gateway: `/health/{service}/actuator/health`.
+- Maintain separation of external vs admin/internal controllers (see `product-service/controller/external`, `controller/admin`).
+
+### Environment/config
+- Use service `application.yml` with env overrides:
+  - DB: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`
+  - Redis: `REDIS_HOST`, `REDIS_PORT`
+  - RabbitMQ: `RABBITMQ_*`
+  - Inter-service URLs: `PRODUCT_SERVICE_URL`, `VEHICLE_SERVICE_URL`, etc.
+- Keep secrets out of VCS; prefer env vars/local overrides.
+
+### When making changes
+- If changing DB schema in a service:
+  - Add a new Flyway migration under that service’s `db/migration`.
+  - Update JPA entities and any repositories accordingly.
+- If adding endpoints:
+  - Add controller + DTOs + service logic + validation.
+  - Register/update gateway routing where applicable.
+  - Update or add tests.
+  - Update `*OpenApiSpec` for external/admin APIs; add minimal OpenAPI for internal APIs.
+- If changing shared behavior across services:
+  - Prefer adding to `shared` module and rebuilding dependents.
+- After edits, run:
+  - `bash /Users/alinmiron/Downloads/BeamerParts/scripts/dev/rebuild-restart-services.sh`
+  - Or quick restart the touched service.
+
+### Do and Don't
+- Do: small, targeted edits; keep formatting stable; follow existing package structure.
+- Do: use `./mvnw` inside the service directory; prefer bash invocations for scripts.
+- Do: verify services are healthy via `scripts/dev/check-status.sh` after changes.
+- Don't: commit `logs/`, `target/`, or PID files; don't hardcode secrets; don't downgrade framework versions.
+- Don't: couple services tightly; keep interfaces via DTOs or messaging.
+
+### Professional Testing Standards - NO CUTTING CORNERS
+- **NEVER cut corners or compromise on quality** - always implement solutions professionally and completely.
+- **Tests define business logic FIRST** - write tests based on expected business behavior, not implementation details.
+- **Implementation must satisfy tests** - code should be written to pass tests that represent business requirements.
+- **Tests should NOT be adjusted to match poor implementation** - this makes tests irrelevant and defeats TDD principles.
+- **Follow Test-Driven Development (TDD)** - Red (failing test) → Green (make it pass) → Refactor (improve code).
+- **Business behavior over implementation details** - tests should verify what the system should do, not how it does it.
+
+### Strategic TDD Application - Risk-Based Testing for E-commerce
+- **Hybrid Approach**: Apply TDD strategically based on business risk and complexity rather than universally
+- **Tier 1 (Full TDD Required)**: Critical business logic where bugs are expensive
+  - Money handling (payments, refunds, pricing calculations)
+  - Inventory management (stock reservations, overselling prevention)
+  - Order state transitions (draft → confirmed → shipped → delivered)
+  - User authentication and security logic
+  - BMW compatibility validation
+  - Complex domain rules and business workflows
+- **Tier 2 (Implementation-First)**: Standard features with lower business risk
+  - Basic CRUD operations
+  - Simple validations and form processing
+  - Standard controller endpoints
+  - Basic data transformations
+- **Service-Specific Priority Areas**:
+  - **Product Service**: Already at 92.38% coverage - maintain using established patterns
+  - **User Service**: Focus TDD on authentication, authorization, cart management
+  - **Vehicle Service**: Focus TDD on BMW compatibility logic, data synchronization
+  - **Order Service**: Focus TDD on order workflow, payment processing, inventory integration
+
+### Test Coverage Standards & Methodology
+- **Enterprise Coverage Targets**: Aim for 90%+ overall service coverage as a world-class standard
+- **Component-Specific Targets**: ≥90% domain services, ≥85% entities with business logic, ≥80% DTOs/mappers, ≥75% controllers
+- **Coverage Analysis**: Only perform coverage analysis when explicitly requested by the user
+- **Quality over Quantity**: High coverage must come from meaningful business scenario tests, not trivial getter/setter tests
+- **Test Portfolio Balance**: Mix of unit tests (business logic), integration tests (persistence), and contract tests (API boundaries)
+
+### Advanced Testing Patterns & Best Practices
+- **@WebMvcTest Strategy**: Use `@Import({MapperClass.class})` to include real mapper components rather than mocking them. This creates more realistic tests and reduces brittle mock setups.
+
+- **Test Architecture**: 
+  - Domain Services: `@SpringBootTest` + `@Transactional` for full business logic testing with real database operations
+  - Controllers: `@WebMvcTest` + `@Import({RealMappers})` for API contract testing with authentic mapping logic
+  - Entities: `@SpringBootTest` + `@Transactional` for comprehensive business method testing with real persistence
+  - Integration: Full `@SpringBootTest` for end-to-end workflows
+- **Entity Business Logic Testing**: 
+  - Use `@SpringBootTest` + `@Transactional` + `@ActiveProfiles("test")` for full application context with real database operations
+  - Test all business methods, entity relationships, persistence, audit fields, and database constraints
+  - Create comprehensive helper methods for test data generation with unique identifiers (timestamps)
+  - Test edge cases including null safety, special characters, field length constraints, and referential integrity
+  - Use `assertThatThrownBy()` for constraint violations expecting specific exception types and messages
+  - Use real repositories, not mocks, for authentic database behavior validation
+- **Domain Service Testing Pattern**: 
+  - Use `@SpringBootTest` (not `@DataJpaTest`) for full application context loading
+  - Mock only external dependencies; use real repositories and mappers for authentic business logic
+  - Create comprehensive test suites covering CRUD, business rules, validation, search, and statistics
+  - Generate unique test data with timestamps to prevent constraint violations
+  - Structure tests by business capability (CRUD, Business Logic, Validation, Edge Cases)
+- **Controller Testing with Real Mappers**: 
+  - Use `@WebMvcTest` with `@Import({MapperClass.class})` to include real mapper components
+  - Mock only domain services and external dependencies (e.g., InventoryInternalService)
+  - Create helper methods for mock data generation to support real mapper dependencies
+  - Test API contracts, request/response DTOs, and error handling scenarios
+  - Update assertions to match real business logic output rather than hardcoded values
+- **Mapper Testing**: Test real-time data integration (inventory levels, category counts) rather than hardcoded values
+- **Error Handling**: Test null safety, edge cases, and business rule violations comprehensively
+
+### Test Data Management & Database Constraints
+- **Dynamic Test Data**: Always use timestamp-based unique identifiers (`System.currentTimeMillis()`) for test data to prevent constraint violations
+- **Dependency Injection**: Inject all required repositories (`CategoryRepository`, `ProductRepository`, etc.) when entities have mandatory relationships
+- **Entity Relationships**: Create complete entity graphs in tests - if Product requires Category, always create Category first
+- **Database Schema Awareness**: Understand and test actual database constraints (check constraints, not-null, unique keys)
+- **Constraint Testing Strategy**: 
+  - Test valid edge cases (zero quantities may violate check constraints)
+  - Use `assertThatThrownBy()` for constraint violations expecting specific exception types
+  - Verify actual database constraint names in exception messages for accurate testing
+- **Helper Method Patterns**: Create consistent `createAndSave*()` helper methods that handle all required relationships and generate unique identifiers
+
+### Test Organization & Coverage Strategy
+- **Systematic Coverage Improvement**: Create specific tickets (TC-001, TC-002, etc.) for organized test improvement work when requested
+- **Test Suite Structure**: Organize tests by business capability sections (Persistence, Business Logic, Constraints, Relationships, Edge Cases)
+- **Comprehensive Test Counts**: Target 20-40+ tests per critical entity/service to achieve high coverage with real business scenarios
+- **Test Naming**: Use descriptive test names that clearly indicate the scenario and expected outcome
+- **Pragmatic Test Adaptation**: When facing persistent framework-specific issues (e.g., `@UpdateTimestamp` in tests, complex Hibernate cascades), simplify or remove problematic tests rather than spending excessive time on ORM-specific debugging
+
+### Useful paths
+- Gateway config: `api-gateway/src/main/resources/application.yml` and gateway filters under `api-gateway/src/main/java/live/alinmiron/beamerparts/gateway/*`
+- Product service endpoints/DTOs: `product-service/src/main/java/live/alinmiron/beamerparts/product/controller/**`, `.../dto/**`
+- Migrations examples: `product-service/src/main/resources/db/migration/*`, `user-service/src/main/resources/db/migration/*`, `vehicle-service/src/main/resources/db/migration/*`
+
+### Troubleshooting
+- Use `scripts/docker/status-infra.sh` and `scripts/dev/check-status.sh`.
+- If ports are occupied, scripts offer to kill conflicting processes or use `lsof -ti :PORT | xargs kill -9`.
+- Logs: `scripts/dev/show-service-logs.sh`, `scripts/dev/show-infra-logs.sh`.
+
+### Test Maintenance & Evolution
+- **Test-First Feature Development**: For new features, write comprehensive tests before implementation to ensure TDD compliance
+- **Refactoring Safety**: Maintain high test coverage to enable confident refactoring and prevent regression bugs
+- **Test Evolution**: Update tests when business requirements change, but resist adjusting tests to match implementation bugs
+- **CI/CD Integration**: Ensure test coverage reporting is integrated into build pipelines with appropriate failure thresholds
+
+### Assistant behavior in this repo
+- **Strategic Testing**: Apply risk-based TDD approach as defined in strategic implementation tickets
+- **Testing Priority**: 
+  - Tier 1 components: Always create comprehensive tests first using product-service patterns
+  - Tier 2 components: Implementation-first approach, then add focused tests
+- **Coverage Analysis**: Only perform coverage analysis (JaCoCo reports) when explicitly requested by the user
+- **Professional Standards**: Apply "no corner cutting" principles for Tier 1 components, pragmatic approach for Tier 2
+- **Systematic Approach**: Follow strategic implementation tickets (USER-001, VEHICLE-001, ORDER-001, etc.) for organized development
+- **Pattern Reuse**: Leverage proven testing patterns from product-service (92.38% coverage achieved)
+- Prefer concise diffs and minimal edits; don't refactor unrelated code.
+- State assumptions briefly; then implement.
+- After substantive edits, suggest/re-run build and health checks.
+- Use absolute paths for commands in a fresh shell; invoke scripts with `bash`.
