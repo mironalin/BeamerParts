@@ -1,0 +1,119 @@
+💰 ORDER SERVICE DEVELOPMENT PROMPT
+You are developing the Order Service for BeamerParts, a BMW parts e-commerce platform.
+
+📋 SERVICE OVERVIEW
+- Service: order-service (port 8084)
+- Database: PostgreSQL order_db (port 5435)
+- Dependencies: Redis (6379), RabbitMQ (5672), Stripe payment processing
+- Role: Order processing, payment handling, Romanian legal compliance
+
+📦 CURRENT STATE
+✅ FOUNDATION COMPLETE:
+- Entities: Order, OrderItem, Payment, Invoice + repositories
+- Database: Complete Flyway migrations with money constraints
+- Configuration: Stripe integration, Redis, RabbitMQ, Romanian compliance
+- DTOs: Basic order and payment transfer objects
+
+🚧 TO IMPLEMENT:
+- Domain services (OrderDomainService, PaymentProcessingService)
+- Controllers (external, internal, admin with OpenAPI)
+- Stripe payment integration with webhook security
+- MapStruct mappers with money calculation logic
+- Comprehensive test suite (90%+ coverage - HIGHEST standard)
+
+🎯 IMPLEMENTATION STRATEGY
+PHASE: Start with OS-M0-external-apis (Customer Order & Checkout APIs)
+APPROACH: Strategic TDD - ALL money-handling logic requires tests FIRST (TIER 1)
+REFERENCE: product-service proven patterns (92.38% coverage achieved)
+STANDARDS: Follow .cursorrules with MAXIMUM testing requirements
+
+🔑 CRITICAL BUSINESS LOGIC (Money Handling - Maximum Security)
+- Order state machine (DRAFT→CONFIRMED→PROCESSING→SHIPPED→DELIVERED)
+- Romanian VAT calculation (19%) with 2-decimal precision (RON)
+- Stripe payment processing with webhook signature verification
+- Order total calculation with tax, shipping, discounts
+- Refund processing (partial and full) with inventory coordination
+- Cart-to-order conversion with price preservation
+- Guest vs registered user order workflows
+
+🧪 TESTING REQUIREMENTS (Money Critical - HIGHEST Priority)
+- Domain Services: @SpringBootTest + @Transactional, 95%+ coverage
+- Controllers: @WebMvcTest + @Import({RealMappers}), 80%+ coverage
+- Entities: ALL money calculation methods with edge cases
+- Payment Security: Webhook validation, fraud prevention, rate limiting
+- Integration: Real repositories/mappers, mock only external services
+- Romanian Compliance: VAT calculations, invoice generation
+
+🔗 SERVICE INTEGRATIONS
+- User Service: Cart data retrieval, user authentication
+- Product Service: Inventory reservation and confirmation
+- Vehicle Service: BMW compatibility validation for orders
+- Stripe API: Payment processing, webhooks, refunds
+- Event Publishing: Order lifecycle, payment status, inventory coordination
+
+📁 PACKAGE STRUCTURE (BeamerParts Standard)
+src/main/java/live/alinmiron/beamerparts/order/
+├── controller/external/     # /api/orders, /api/checkout (via gateway)
+├── controller/internal/     # /internal/orders, /internal/payments
+├── controller/admin/        # /api/admin/orders (order management)
+├── service/domain/          # OrderDomainService, PaymentProcessingService
+├── service/internal/        # Order coordination, inventory management
+├── mapper/                 # MapStruct with money calculation logic
+├── entity/                 # ✅ Order, OrderItem, Payment, Invoice
+├── repository/             # ✅ Spring Data JPA repositories
+├── dto/                    # ✅ Basic order DTOs + comprehensive additions
+├── event/                  # RabbitMQ publishers/listeners
+└── exception/              # Order-specific exceptions + GlobalExceptionHandler
+
+🚀 STEP-BY-STEP EXECUTION
+1. Read docs/tickets/order-service/OS-M0-external-apis.md (requirements)
+2. Read docs/tickets/order-service/BUSINESS-LOGIC.md (order domain expertise)
+3. IMPLEMENT OrderDomainService with TDD (ALL money logic tests FIRST)
+4. CREATE external order controllers (/api/orders, /api/checkout)
+5. IMPLEMENT Stripe payment processing with webhook security
+6. ADD order state machine with comprehensive validation
+7. CREATE mappers with Romanian VAT and money precision
+8. ACHIEVE 90%+ test coverage with money-handling focus
+
+📚 REFERENCE MATERIALS
+Essential Reading:
+- .cursorrules - HIGHEST testing standards for money handling
+- docs/tickets/order-service/BUSINESS-LOGIC.md - Order & payment logic
+- docs/tickets/order-service/DEVELOPMENT-CONTEXT.md - Service architecture
+- product-service/ - Proven testing patterns (92.38% coverage)
+- docs/beamerparts_api_contract.md - Order API specifications
+- Stripe Documentation - Payment processing and webhook security
+
+🎯 SUCCESS CRITERIA (Maximum Standards)
+- M0 phase complete with 90%+ coverage (highest in platform)
+- ALL money calculation paths tested with edge cases
+- Romanian VAT compliance (19%) working perfectly
+- Stripe payment processing secure and robust
+- Order state machine transitions fully validated
+- Cart-to-order conversion seamless and accurate
+
+💸 MONEY-HANDLING TEST SCENARIOS
+Critical tests to implement (NO EXCEPTIONS):
+- Romanian VAT calculation: 19% with 2-decimal precision
+- Order total calculation: subtotal + tax + shipping - discounts
+- Currency precision: Romanian Lei (RON) 2-decimal validation
+- Payment processing: Success, failure, timeout, fraud scenarios
+- Refund processing: Partial and full refunds with inventory impact
+- Order state transitions: All valid and invalid transition paths
+- Concurrent orders: Race conditions and inventory conflicts
+
+🔒 SECURITY & COMPLIANCE REQUIREMENTS
+- Stripe webhook signature verification (MANDATORY)
+- Payment rate limiting and fraud prevention
+- Romanian invoice sequential numbering compliance
+- Audit logging for ALL money-related operations
+- PCI compliance for payment data handling
+- GDPR compliance for customer order data
+
+💡 KEY REMINDERS
+- Money handling is CRITICAL - test EVERY calculation path
+- Use Strategic TDD for ALL TIER 1 components (payments, orders)
+- Romanian compliance is MANDATORY - test VAT calculations thoroughly
+- Follow product-service patterns but with HIGHEST standards
+- Timestamp-based unique test data for order/payment scenarios
+- NEVER cut corners on payment security or money calculations
