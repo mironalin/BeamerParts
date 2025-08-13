@@ -54,8 +54,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Uses idx_products_featured index
     List<Product> findByIsFeatured(Boolean isFeatured);
     
+    // Uses idx_products_featured index with pagination
+    Page<Product> findByIsFeatured(Boolean isFeatured, Pageable pageable);
+    
     // Uses idx_products_featured and idx_products_status indexes
     List<Product> findByIsFeaturedAndStatus(Boolean isFeatured, ProductStatus status);
+    
+    // Uses idx_products_featured and idx_products_status indexes with pagination
+    Page<Product> findByStatusAndIsFeatured(ProductStatus status, Boolean isFeatured, Pageable pageable);
+    
+    // Uses idx_products_category and idx_products_featured indexes
+    Page<Product> findByCategoryAndIsFeatured(Category category, Boolean isFeatured, Pageable pageable);
+    
+    // Complex filter: category, status, and featured
+    Page<Product> findByCategoryAndStatusAndIsFeatured(Category category, ProductStatus status, Boolean isFeatured, Pageable pageable);
     
     // Find by brand
     List<Product> findByBrandAndStatus(String brand, ProductStatus status);
@@ -115,8 +127,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     // Find products by generation compatibility
     @Query("SELECT DISTINCT p FROM Product p " +
-           "JOIN p.compatibility pc WHERE pc.generationCache.code = :generationCode " +
-           "AND p.status = 'ACTIVE' ORDER BY p.name")
+           "WHERE p.status = 'ACTIVE' AND (" +
+           "EXISTS (SELECT 1 FROM ProductCompatibility pc WHERE pc.product = p AND pc.generationCache.code = :generationCode) " +
+           "OR UPPER(p.sku) LIKE UPPER(CONCAT('%', :generationCode, '%')) " +
+           "OR UPPER(p.name) LIKE UPPER(CONCAT('%', :generationCode, '%'))" +
+           ") ORDER BY p.name")
     List<Product> findByCompatibleGeneration(@Param("generationCode") String generationCode);
     
     // Find products by series compatibility
@@ -129,4 +144,28 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.status = 'ACTIVE' " +
            "ORDER BY p.updatedAt DESC")
     Page<Product> findRecentlyUpdated(Pageable pageable);
+    
+    // Comprehensive search with filters
+    @Query(value = "SELECT * FROM products p WHERE " +
+           "(:searchTerm IS NULL OR " +
+           "to_tsvector('english', p.name || ' ' || COALESCE(p.description, '')) @@ plainto_tsquery('english', :searchTerm)) " +
+           "AND (:categoryId IS NULL OR p.category_id = :categoryId) " +
+           "AND (:minPrice IS NULL OR p.base_price >= :minPrice) " +
+           "AND (:maxPrice IS NULL OR p.base_price <= :maxPrice) " +
+           "AND p.status = :status " +
+           "ORDER BY p.name",
+           countQuery = "SELECT COUNT(*) FROM products p WHERE " +
+           "(:searchTerm IS NULL OR " +
+           "to_tsvector('english', p.name || ' ' || COALESCE(p.description, '')) @@ plainto_tsquery('english', :searchTerm)) " +
+           "AND (:categoryId IS NULL OR p.category_id = :categoryId) " +
+           "AND (:minPrice IS NULL OR p.base_price >= :minPrice) " +
+           "AND (:maxPrice IS NULL OR p.base_price <= :maxPrice) " +
+           "AND p.status = :status",
+           nativeQuery = true)
+    Page<Product> searchProductsWithFilters(@Param("searchTerm") String searchTerm,
+                                           @Param("categoryId") Long categoryId,
+                                           @Param("minPrice") BigDecimal minPrice,
+                                           @Param("maxPrice") BigDecimal maxPrice,
+                                           @Param("status") String status,
+                                           Pageable pageable);
 }

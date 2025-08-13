@@ -3,7 +3,9 @@ package live.alinmiron.beamerparts.product.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -54,11 +56,10 @@ public class Product {
     
     @Column(name = "weight_grams")
     private Integer weightGrams;
-    
+
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "dimensions_json", columnDefinition = "JSONB")
-    private String dimensionsJson; // {"length": 10, "width": 5, "height": 2}
-    
-    @Column(name = "is_featured", nullable = false)
+    private String dimensionsJson; // {"length": 10, "width": 5, "height": 2}    @Column(name = "is_featured", nullable = false)
     @Builder.Default
     private Boolean isFeatured = false;
     
@@ -124,5 +125,13 @@ public class Product {
     
     public String getDisplayName() {
         return brand != null ? brand + " " + name : name;
+    }
+    
+    /**
+     * Business method: Check if product is available for purchase
+     * Business rule: Only active products can be purchased
+     */
+    public boolean isAvailableForPurchase() {
+        return ProductStatus.ACTIVE.equals(status);
     }
 }

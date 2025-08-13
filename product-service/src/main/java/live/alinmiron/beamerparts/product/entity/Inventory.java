@@ -73,7 +73,7 @@ public class Inventory {
         return quantity != null && quantity > 0 && quantityAvailable >= quantity;
     }
     
-    public void reserveQuantity(Integer quantity) {
+    public void makeReservation(Integer quantity) {
         if (canReserve(quantity)) {
             quantityAvailable -= quantity;
             quantityReserved += quantity;
@@ -89,6 +89,46 @@ public class Inventory {
         } else {
             throw new IllegalArgumentException("Cannot release " + quantity + " items. Reserved: " + quantityReserved);
         }
+    }
+    
+    /**
+     * Business method: Reserve quantity (used by domain service)
+     */
+    public void reserveQuantity(Integer quantity) {
+        if (!canReserve(quantity)) {
+            throw new IllegalArgumentException("Cannot reserve " + quantity + " items. Available: " + quantityAvailable);
+        }
+        makeReservation(quantity);
+        lastUpdated = LocalDateTime.now();
+    }
+    
+    /**
+     * Business method: Release reserved quantity (used by domain service)
+     */
+    public void releaseQuantity(Integer quantity) {
+        if (quantity == null || quantity <= 0 || quantityReserved < quantity) {
+            throw new IllegalArgumentException("Cannot release " + quantity + " items. Reserved: " + quantityReserved);
+        }
+        releaseReservation(quantity);
+        lastUpdated = LocalDateTime.now();
+    }
+    
+    /**
+     * Business method: Adjust total available quantity (inventory management)
+     */
+    public void adjustQuantity(Integer newQuantity) {
+        if (newQuantity == null || newQuantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative: " + newQuantity);
+        }
+        
+        // Cannot reduce below current reservations
+        if (newQuantity < quantityReserved) {
+            throw new IllegalArgumentException("Cannot set quantity to " + newQuantity + 
+                " - would conflict with " + quantityReserved + " reserved items");
+        }
+        
+        quantityAvailable = newQuantity - quantityReserved;
+        lastUpdated = LocalDateTime.now();
     }
     
     public String getDisplayName() {
