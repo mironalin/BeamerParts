@@ -1,4 +1,4 @@
-package live.alinmiron.beamerparts.product.dto.request;
+package live.alinmiron.beamerparts.product.dto.external.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

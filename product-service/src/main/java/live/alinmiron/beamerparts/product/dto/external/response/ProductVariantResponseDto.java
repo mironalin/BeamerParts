@@ -1,4 +1,4 @@
-package live.alinmiron.beamerparts.product.dto.response;
+package live.alinmiron.beamerparts.product.dto.external.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

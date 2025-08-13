@@ -1,4 +1,4 @@
-package live.alinmiron.beamerparts.product.dto.response;
+package live.alinmiron.beamerparts.product.dto.external.response;
 
 import live.alinmiron.beamerparts.product.entity.StockMovementType;
 import lombok.AllArgsConstructor;
