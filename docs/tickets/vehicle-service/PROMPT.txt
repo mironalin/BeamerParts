@@ -1,0 +1,103 @@
+🚗 VEHICLE SERVICE DEVELOPMENT PROMPT
+You are developing the Vehicle Service for BeamerParts, a BMW parts e-commerce platform.
+
+📋 SERVICE OVERVIEW
+- Service: vehicle-service (port 8082)
+- Database: PostgreSQL vehicle_db (port 5434)
+- Dependencies: Redis (6379), RabbitMQ (5672), BMW data integration
+- Role: BMW hierarchy, compatibility validation, authoritative BMW data source
+
+📦 CURRENT STATE
+✅ FOUNDATION COMPLETE:
+- Entities: BmwSeries, BmwGeneration, VehicleCompatibilityRegistry + repositories
+- Database: Complete Flyway migrations with BMW hierarchy constraints
+- Configuration: Redis caching, RabbitMQ events, BMW data structure
+- DTOs: Basic BMW data transfer objects
+
+🚧 TO IMPLEMENT:
+- Domain services (BmwCompatibilityDomainService, VehicleDataSyncService)
+- Controllers (external, internal, admin with OpenAPI)
+- BMW data caching layer with Redis optimization
+- MapStruct mappers with BMW-specific business logic
+- Comprehensive test suite (85%+ coverage target)
+
+🎯 IMPLEMENTATION STRATEGY
+PHASE: Start with VS-M0-external-internal-apis (BMW Lookup & Compatibility)
+APPROACH: Strategic TDD - BMW compatibility logic requires tests FIRST (TIER 1)
+REFERENCE: product-service proven patterns (92.38% coverage achieved)
+STANDARDS: Follow .cursorrules methodology with BMW-specific focus
+
+🔑 CRITICAL BMW BUSINESS LOGIC
+- Year boundary transitions (F30 2019 vs G20 2019 edge cases)
+- Body code compatibility (F30, F31, F34, F35 variants)
+- Engine variant rules (320i vs 330d compatibility differences)
+- Series-level compatibility validation (3 Series vs X-Series parts)
+- BMW data synchronization as authoritative source
+- Complex generation overlaps and transition periods
+
+🧪 TESTING REQUIREMENTS (BMW Logic Critical - High Priority)
+- Domain Services: @SpringBootTest + @Transactional, 90%+ coverage
+- Controllers: @WebMvcTest + @Import({RealMappers}), 75%+ coverage
+- Entities: BMW business methods with real hierarchy data
+- BMW Edge Cases: Year boundaries, body codes, generation transitions
+- Integration: Real repositories/mappers, mock only external services
+
+🔗 SERVICE INTEGRATIONS
+- Product Service: BMW cache synchronization (authoritative source)
+- User Service: BMW vehicle validation for user garage
+- Order Service: Compatibility validation during checkout
+- Event Publishing: BMW data changes, compatibility updates
+
+📁 PACKAGE STRUCTURE (BeamerParts Standard)
+src/main/java/live/alinmiron/beamerparts/vehicle/
+├── controller/external/     # /api/vehicles, /api/compatibility (via gateway)
+├── controller/internal/     # /internal/bmw, /internal/compatibility
+├── controller/admin/        # /api/admin/vehicles (BMW data management)
+├── service/domain/          # BmwCompatibilityDomainService, VehicleDataSyncService
+├── service/internal/        # BMW cache sync, data management
+├── mapper/                 # MapStruct with BMW business logic
+├── entity/                 # ✅ BmwSeries, BmwGeneration, CompatibilityRegistry
+├── repository/             # ✅ Spring Data JPA repositories
+├── dto/                    # ✅ Basic BMW DTOs + comprehensive additions
+└── exception/              # BMW-specific exceptions + GlobalExceptionHandler
+
+🚀 STEP-BY-STEP EXECUTION
+1. Read docs/tickets/vehicle-service/VS-M0-external-internal-apis.md (requirements)
+2. Read docs/tickets/vehicle-service/BUSINESS-LOGIC.md (BMW domain expertise)
+3. IMPLEMENT BmwCompatibilityDomainService with TDD (tests FIRST)
+4. CREATE BMW lookup controllers (/api/vehicles endpoints)
+5. IMPLEMENT compatibility validation with complex BMW rules
+6. ADD Redis caching for BMW hierarchy and compatibility results
+7. CREATE mappers with BMW business logic (year ranges, body codes)
+8. ACHIEVE 85%+ test coverage with BMW edge case focus
+
+📚 REFERENCE MATERIALS
+Essential Reading:
+- .cursorrules - Testing standards and architectural patterns
+- docs/tickets/vehicle-service/BUSINESS-LOGIC.md - BMW compatibility rules
+- docs/tickets/vehicle-service/DEVELOPMENT-CONTEXT.md - Service architecture
+- product-service/ - Proven testing patterns (92.38% coverage)
+- docs/beamerparts_api_contract.md - BMW API specifications
+
+🎯 SUCCESS CRITERIA
+- M0 phase complete with 85%+ coverage
+- BMW compatibility validation working for all edge cases
+- Year boundary logic (2019 F30/G20) correctly implemented
+- Body code compatibility (F30 variants) properly validated
+- Service-to-service BMW data sync ready
+
+🏁 BMW-SPECIFIC TEST SCENARIOS
+Critical tests to implement:
+- 2019 BMW 3 Series: F30 (ending) vs G20 (starting) year boundary
+- F30 body variants: F30 sedan, F31 wagon, F34 GT compatibility
+- Engine compatibility: 320i vs 330d part differences
+- Series compatibility: 3 Series vs X3 part validation
+- Generation transitions: Mid-year model changes
+- BMW data sync: Conflict resolution with product-service
+
+💡 KEY REMINDERS
+- BMW compatibility is CRITICAL - test every edge case
+- Use Strategic TDD for TIER 1 components (compatibility, sync)
+- Focus on real BMW scenarios (F30/G20 2019 transition)
+- Follow product-service patterns exactly
+- Timestamp-based unique test data for BMW codes/generations
